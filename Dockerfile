@@ -2,7 +2,8 @@ FROM python:3.12-slim
 
 # WeasyPrint system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 \
+    libcairo2 libpango-1.0-0 libpangocairo-1.0-0 \
+    libgdk-pixbuf-xlib-2.0-0 libgdk-pixbuf2.0-dev \
     libffi-dev shared-mime-info && \
     rm -rf /var/lib/apt/lists/*
 
