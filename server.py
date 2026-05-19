@@ -466,6 +466,7 @@ pre {{ background: #f4f5f7; padding: 12px; border-radius: 4px; overflow-x: auto;
 # ── Static files mount (must be last) ───────────────────────────────────────
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="root")
 
 # ── Entry point ──────────────────────────────────────────────────────────────
 
