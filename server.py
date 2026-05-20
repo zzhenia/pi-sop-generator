@@ -228,31 +228,32 @@ def get_config():
     }
 
 
-SOP_CATALOGUE_ROOT_ID = "187269135"
+SOPS_ROOT_ID = "123994117"  # "SOPs" folder in PI Confluence
 
 _folder_cache = {"tree": None, "expires": 0}
 
 
 def _fetch_folder_tree():
-    """Fetch the full page tree under the SOP Catalogue root from Confluence."""
+    """Fetch the full folder tree under the SOPs root from Confluence."""
     now = time.time()
     if _folder_cache["tree"] and now < _folder_cache["expires"]:
         return _folder_cache["tree"]
 
     base = PI["base"]
 
-    def get_children(page_id, depth=0):
-        """Recursively get child pages."""
+    def get_child_folders(page_id, depth=0):
+        """Recursively get child folders using the v1 child/folder endpoint."""
         resp = requests.get(
-            f"{base}/api/v2/pages/{page_id}/children",
+            f"{base}/rest/api/content/{page_id}/child/folder",
             auth=PI_AUTH,
-            params={"limit": 50, "sort": "title"},
+            params={"limit": 50},
         )
         if not resp.ok:
             return []
+        children = sorted(resp.json().get("results", []), key=lambda x: x["title"])
         results = []
-        for page in resp.json().get("results", []):
-            indent = "\u00a0\u00a0\u00a0\u00a0" * depth  # non-breaking spaces for indent
+        for page in children:
+            indent = "\u2003" * depth  # em-space for visual indent
             prefix = "└ " if depth > 0 else ""
             results.append({
                 "id": page["id"],
@@ -260,18 +261,17 @@ def _fetch_folder_tree():
                 "label": f"{indent}{prefix}{page['title']}",
                 "depth": depth,
             })
-            # Recurse into children (max 3 levels deep)
-            if depth < 3:
-                results.extend(get_children(page["id"], depth + 1))
+            if depth < 4:
+                results.extend(get_child_folders(page["id"], depth + 1))
         return results
 
     tree = [{
-        "id": SOP_CATALOGUE_ROOT_ID,
-        "title": "SOP Catalogue (root)",
-        "label": "SOP Catalogue (root)",
+        "id": SOPS_ROOT_ID,
+        "title": "SOPs (root)",
+        "label": "SOPs (root)",
         "depth": 0,
     }]
-    tree.extend(get_children(SOP_CATALOGUE_ROOT_ID, 1))
+    tree.extend(get_child_folders(SOPS_ROOT_ID, 1))
 
     _folder_cache["tree"] = tree
     _folder_cache["expires"] = now + 600  # 10 min cache
@@ -284,7 +284,6 @@ def get_folders():
         return _fetch_folder_tree()
     except Exception as e:
         log.error("Failed to fetch folder tree: %s", e)
-        # Fall back to hardcoded folders
         return [{"id": v, "title": k, "label": k, "depth": 0}
                 for k, v in PI_PARENT_FOLDERS.items()]
 
