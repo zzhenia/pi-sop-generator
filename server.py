@@ -451,6 +451,11 @@ Raw input material (transcripts, notes, and process descriptions):
 
 {raw_text}
 
+IMPORTANT:
+- Today's date is {date.today().isoformat()}. Use this as the date in the Version History table.
+- Do NOT include an H1 title at the top -- the page title is set separately.
+- Start directly with ## Header / Control Block.
+
 Generate a complete, well-structured SOP based on this material. Follow the template exactly. Include all sections: Purpose, Scope, Roles and Responsibilities, Review and Approval, Procedure (with numbered steps), Checklist (with checkbox items), and Review and Maintenance with a Version History table. Return ONLY the Markdown inside a fenced code block."""
 
     if not ANTHROPIC_KEY:

@@ -153,9 +153,8 @@ def md_table_to_html(lines):
 
     for row in data_rows:
         html += "<tr>"
-        for i, cell in enumerate(row):
-            tag = "th" if i == 0 and len(header) == 2 else "td"
-            html += f"<{tag}><p>{inline_format(cell)}</p></{tag}>"
+        for cell in row:
+            html += f"<td><p>{inline_format(cell)}</p></td>"
         html += "</tr>"
 
     html += "</tbody></table>"
@@ -180,12 +179,12 @@ def build_control_block(metadata):
 
     loom = metadata.get("loom_explainers", "")
     if loom:
-        loom_html = ""
+        loom_links = []
         for url in loom.split(","):
             url = url.strip()
             if url:
-                loom_html += f'<p><a href="{url}" data-card-appearance="inline">{url}</a></p>'
-        add_row("Loom Explainers", loom_html if loom_html else "")
+                loom_links.append(f'<a href="{url}" data-card-appearance="inline">{url}</a>')
+        add_row("Loom Explainers", "<br />".join(loom_links) if loom_links else "")
     else:
         add_row("Loom Explainers", "")
 
@@ -247,6 +246,7 @@ def md_to_storage_format(md_text, metadata):
     html_parts = []
     i = 0
     list_stack = []  # stack of open list tags ('ol' or 'ul')
+    skipped_h1 = False  # skip the first H1 (page title is shown by Confluence)
 
     while i < len(lines):
         line = lines[i]
@@ -297,6 +297,11 @@ def md_to_storage_format(md_text, metadata):
             # Close any open lists before a heading
             html_parts.extend(_close_lists(list_stack))
             level = len(heading_match.group(1))
+            # Skip the first H1 — Confluence already shows the page title
+            if level == 1 and not skipped_h1:
+                skipped_h1 = True
+                i += 1
+                continue
             text = inline_format(heading_match.group(2))
             html_parts.append(f"<h{level}>{text}</h{level}>")
             i += 1
