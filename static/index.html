@@ -98,6 +98,10 @@
       <div class="preview-toolbar">
         <button class="btn btn-sm" data-action="download-md" id="btn-dl-md" disabled>Download .md</button>
         <button class="btn btn-sm" data-action="download-pdf" id="btn-dl-pdf" disabled>Download .pdf</button>
+        <label class="toolbar-checkbox" title="Page will not be visible until promoted from draft">
+          <input type="checkbox" id="publish-as-draft" checked>
+          Draft
+        </label>
         <button class="btn btn-sm btn-primary" data-action="publish" id="btn-publish" disabled>Publish to Confluence</button>
       </div>
       <div class="preview-container" id="preview-container">
@@ -118,10 +122,6 @@
     <label class="form-label">
       Parent Folder
       <select id="parent-folder"></select>
-    </label>
-    <label class="form-checkbox" style="display:flex;align-items:center;gap:8px;margin-top:16px;font-size:13px;cursor:pointer;">
-      <input type="checkbox" id="publish-as-draft" checked>
-      Publish as draft (page will not be visible until promoted)
     </label>
     <div class="modal-actions">
       <button class="btn" data-action="cancel-publish">Cancel</button>

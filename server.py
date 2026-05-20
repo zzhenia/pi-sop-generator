@@ -348,6 +348,7 @@ def generate_sop(body: dict):
     owner = body.get("owner", "")
     tools = body.get("tools_required", "")
     status = body.get("status", "DRAFT")
+    loom_urls = body.get("loom_urls", [])
     raw_text = body.get("raw_text", "")
     review_date = body.get("review_date", "")
 
@@ -368,7 +369,7 @@ def generate_sop(body: dict):
         "status": status,
         "review_date": review_date,
         "tools_required": tools,
-        "loom_explainers": "",
+        "loom_explainers": ", ".join(loom_urls),
     }
 
     user_prompt = f"""Generate a complete SOP using the following template structure:

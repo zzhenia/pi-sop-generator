@@ -238,6 +238,11 @@ async function handleGenerate() {
   const status = document.getElementById('status').value || 'DRAFT';
   const rawText = document.getElementById('raw-text').value.trim();
 
+  // Collect Loom URLs
+  const loomUrls = Array.from(document.querySelectorAll('.loom-url'))
+    .map(input => input.value.trim())
+    .filter(url => url);
+
   if (!title) return toast('Title is required.', 'error');
   if (!author) return toast('Author is required.', 'error');
   if (!rawText) return toast('Please provide some input text.', 'error');
@@ -255,6 +260,7 @@ async function handleGenerate() {
       owner: owner || author,
       tools_required: tools,
       status,
+      loom_urls: loomUrls,
       raw_text: rawText,
     });
 

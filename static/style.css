@@ -299,11 +299,24 @@ textarea {
 
 .preview-toolbar {
   display: flex;
+  align-items: center;
   gap: 8px;
   padding: 12px 24px;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   flex-shrink: 0;
+}
+
+.toolbar-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: 4px;
 }
 
 .preview-container {
