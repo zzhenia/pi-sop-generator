@@ -44,6 +44,16 @@ body {
   flex-shrink: 0;
 }
 
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-logo {
+  height: 28px;
+}
+
 .app-title {
   font-size: 16px;
   font-weight: 600;

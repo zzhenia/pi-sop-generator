@@ -292,6 +292,46 @@ async def upload_file(file: UploadFile):
     return {"text": text, "filename": name}
 
 
+@app.post("/api/extract-metadata")
+def extract_metadata(body: dict):
+    """Use Claude to extract SOP metadata fields from raw input text."""
+    raw_text = body.get("raw_text", "").strip()
+    if not raw_text:
+        raise HTTPException(400, "No input text provided.")
+    if not ANTHROPIC_KEY:
+        raise HTTPException(500, "ANTHROPIC_API_KEY not configured.")
+
+    known_names = ", ".join(f"@{k}" for k in KNOWN_USERS)
+    prompt = f"""Extract the following SOP metadata from the text below. Return ONLY a JSON object with these fields:
+- "title": a concise descriptive title for this SOP (do not include "[SOP]" prefix)
+- "author": the person writing or presenting this process (use one of: {known_names}, or leave empty)
+- "approver": the person who would approve this (use one of: {known_names}, or leave empty)
+- "owner": the person or team responsible for maintaining this process (use one of: {known_names}, or leave empty)
+- "tools_required": comma-separated list of tools/software mentioned (e.g. "Asana, Slack, Google Sheets")
+
+If a field cannot be determined, use an empty string. For author/approver/owner, return just the @handle (e.g. "@zhenia"), not the full name.
+
+Text:
+{raw_text[:4000]}"""
+
+    try:
+        client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=500,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = response.content[0].text
+        # Extract JSON from response
+        json_match = re.search(r"\{.*\}", raw, re.DOTALL)
+        if json_match:
+            return json.loads(json_match.group())
+        return json.loads(raw)
+    except Exception as e:
+        log.error("Metadata extraction error: %s", e)
+        raise HTTPException(500, f"Extraction failed: {e}")
+
+
 @app.post("/api/generate")
 def generate_sop(body: dict):
     title = body.get("title", "").strip()

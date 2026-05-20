@@ -182,6 +182,51 @@ async function handleFiles(fileList) {
   }
 }
 
+// ── Pre-fill metadata ───────────────────────────────────────────────────────
+
+async function handlePrefill() {
+  const rawText = document.getElementById('raw-text').value.trim();
+  if (!rawText) return toast('Add some input text first (paste, upload, or fetch Loom transcripts).', 'error');
+
+  const btn = document.getElementById('prefill-btn');
+  btn.classList.add('loading');
+  btn.textContent = 'Extracting...';
+
+  try {
+    const data = await api('POST', '/api/extract-metadata', { raw_text: rawText });
+
+    if (data.title) document.getElementById('sop-title').value = data.title;
+    if (data.tools_required) document.getElementById('tools-required').value = data.tools_required;
+
+    // Set dropdowns by matching the @handle (strip the @ prefix)
+    if (data.author) {
+      const key = data.author.replace(/^@/, '');
+      if (document.querySelector(`#author option[value="${key}"]`)) {
+        document.getElementById('author').value = key;
+      }
+    }
+    if (data.approver) {
+      const key = data.approver.replace(/^@/, '');
+      if (document.querySelector(`#approver option[value="${key}"]`)) {
+        document.getElementById('approver').value = key;
+      }
+    }
+    if (data.owner) {
+      const key = data.owner.replace(/^@/, '');
+      if (document.querySelector(`#owner option[value="${key}"]`)) {
+        document.getElementById('owner').value = key;
+      }
+    }
+
+    toast('Metadata extracted and fields updated.', 'success');
+  } catch (e) {
+    toast('Pre-fill failed: ' + e.message, 'error');
+  } finally {
+    btn.classList.remove('loading');
+    btn.textContent = 'Pre-fill Metadata from Input';
+  }
+}
+
 // ── Generate SOP ────────────────────────────────────────────────────────────
 
 async function handleGenerate() {
@@ -321,6 +366,7 @@ document.body.addEventListener('click', async (e) => {
   if (!el) return;
 
   switch (el.dataset.action) {
+    case 'prefill-fields':  await handlePrefill(); break;
     case 'generate-sop':    await handleGenerate(); break;
     case 'fetch-all-loom':  await fetchAllLoom(); break;
     case 'add-loom-field':  addLoomField(); break;

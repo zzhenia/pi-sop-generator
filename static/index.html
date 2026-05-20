@@ -11,7 +11,10 @@
 
   <!-- Header -->
   <div class="app-header">
-    <span class="app-title">SOP Generator</span>
+    <div class="app-header-left">
+      <img src="/static/PI_logo_hor-light.svg" alt="Pilot Institute" class="app-logo">
+      <span class="app-title">SOP Generator</span>
+    </div>
     <div class="app-header-right">
       <span class="sop-id-badge" id="sop-id-badge">---</span>
     </div>
@@ -79,6 +82,10 @@
           <button class="btn btn-sm btn-accent" data-action="fetch-all-loom">Fetch Transcripts</button>
         </div>
       </div>
+
+      <button class="btn btn-accent btn-large" data-action="prefill-fields" id="prefill-btn">
+        Pre-fill Metadata from Input
+      </button>
 
       <button class="btn btn-primary btn-large" data-action="generate-sop" id="generate-btn">
         Generate SOP
