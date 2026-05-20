@@ -47,13 +47,26 @@ async function init() {
   populateSelect('status', config.statuses.map(s => ({ key: s, display: s })), 'key', 'display');
   document.getElementById('status').value = 'DRAFT';
 
-  // Populate parent folders in publish modal
-  const folderSelect = document.getElementById('parent-folder');
-  for (const [label, id] of Object.entries(config.parent_folders)) {
-    const opt = document.createElement('option');
-    opt.value = id;
-    opt.textContent = label;
-    folderSelect.appendChild(opt);
+  // Populate parent folders from Confluence tree
+  try {
+    const folders = await api('GET', '/api/folders');
+    const folderSelect = document.getElementById('parent-folder');
+    folderSelect.innerHTML = '<option value="">-- Select folder --</option>';
+    for (const f of folders) {
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = f.label;
+      folderSelect.appendChild(opt);
+    }
+  } catch (e) {
+    // Fall back to config folders
+    const folderSelect = document.getElementById('parent-folder');
+    for (const [label, id] of Object.entries(config.parent_folders)) {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = label;
+      folderSelect.appendChild(opt);
+    }
   }
 
   // Fetch next SOP ID
