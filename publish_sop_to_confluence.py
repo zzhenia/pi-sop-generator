@@ -45,9 +45,10 @@ STATUS_COLOURS = {
 KNOWN_USERS = {
     "zhenia": "712020:019e327f-0236-4db3-ba19-c0b588cc1230",
     "roberto": "712020:2d84d7dc-bbae-4d09-bc09-a74ff5aa4d56",
-    "jesse": "712020:034b151c-fca9-4487-b7c0-01e97b8612cc",
-    "greg": "5af22c2ca741a92a65124569",
-    "ben": "712020:e55b6ea2-bb2d-4ea3-82ee-32b5ea2c98c4",
+    "jesse": "712020:e1134bfc-47b0-4f30-a761-e50eaf31a608",
+    "greg": "620fde632fd2470071cbe396",
+    "ben": "712020:d3bb8f2a-1b27-44af-a37e-65feb55e6070",
+    "bo": "712020:83b04c3c-421a-464d-9c1c-e73c8d426351",
 }
 
 

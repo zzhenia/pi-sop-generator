@@ -88,6 +88,7 @@ USER_DISPLAY = {
     "jesse": "Jesse Ekkerd",
     "greg": "Greg Reverdiau",
     "ben": "Ben Pitroff",
+    "bo": "Bo Allen",
 }
 
 # ── Next-ID cache ───────────────────────────────────────────────────────────
