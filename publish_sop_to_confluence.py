@@ -49,6 +49,7 @@ KNOWN_USERS = {
     "greg": "620fde632fd2470071cbe396",
     "ben": "712020:d3bb8f2a-1b27-44af-a37e-65feb55e6070",
     "bo": "712020:83b04c3c-421a-464d-9c1c-e73c8d426351",
+    "carissa": "712020:37dbedfd-edbc-4397-9a7e-b1b695f53ef6",
 }
 
 
@@ -360,15 +361,32 @@ def md_to_storage_format(md_text, metadata):
             i += 1
             continue
 
-        # ── Checkbox items ───────────────────────────────────────────
+        # ── Checkbox items → Confluence task list ────────────────────
         checkbox_match = re.match(r"^[-*]\s*\[([ xX])\]\s*(.*)", stripped)
         if checkbox_match:
             html_parts.extend(_close_lists(list_stack))
             checked = checkbox_match.group(1).lower() == "x"
             text = inline_format(checkbox_match.group(2))
-            prefix = "[x]" if checked else "[ ]"
-            html_parts.append(f"<p>{prefix} {text}</p>")
+            status = "complete" if checked else "incomplete"
+            # Collect consecutive checkbox lines into one task list
+            tasks = [(status, text)]
             i += 1
+            while i < len(lines):
+                next_match = re.match(r"^[-*]\s*\[([ xX])\]\s*(.*)", lines[i].strip())
+                if not next_match:
+                    break
+                c = "complete" if next_match.group(1).lower() == "x" else "incomplete"
+                tasks.append((c, inline_format(next_match.group(2))))
+                i += 1
+            task_items = []
+            for s, t in tasks:
+                task_items.append(
+                    f'<ac:task><ac:task-status>{s}</ac:task-status>'
+                    f'<ac:task-body>{t}</ac:task-body></ac:task>'
+                )
+            html_parts.append(
+                f'<ac:task-list>{"".join(task_items)}</ac:task-list>'
+            )
             continue
 
         # ── Empty lines ──────────────────────────────────────────────

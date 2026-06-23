@@ -89,6 +89,7 @@ USER_DISPLAY = {
     "greg": "Greg Reverdiau",
     "ben": "Ben Pitroff",
     "bo": "Bo Allen",
+    "carissa": "Carissa Schuster",
 }
 
 # ── Next-ID cache ───────────────────────────────────────────────────────────
@@ -201,6 +202,22 @@ def confluence_html_to_preview(storage_html):
         html,
         flags=re.DOTALL,
     )
+
+    # Task lists → checkbox preview
+    def replace_task(m):
+        status = m.group(1)
+        body = m.group(2)
+        check = "&#9745;" if status == "complete" else "&#9744;"
+        return f'<li style="list-style:none">{check} {body}</li>'
+
+    html = re.sub(
+        r'<ac:task><ac:task-status>(.*?)</ac:task-status>'
+        r'<ac:task-body>(.*?)</ac:task-body></ac:task>',
+        replace_task,
+        html,
+    )
+    html = re.sub(r'<ac:task-list>', '<ul style="padding-left:8px">', html)
+    html = re.sub(r'</ac:task-list>', '</ul>', html)
 
     # Remove any remaining local-id attributes
     html = re.sub(r'\s*(?:local-id|ac:local-id|ac:macro-id)="[^"]*"', "", html)
@@ -466,11 +483,13 @@ Generate a complete, well-structured SOP based on this material. Follow the temp
         client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
         response = client.messages.create(
             model="claude-sonnet-4-6",
-            max_tokens=8000,
+            max_tokens=16000,
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_prompt}],
         )
         raw_response = response.content[0].text
+        if response.stop_reason == "max_tokens":
+            log.warning("SOP generation hit max_tokens — output may be truncated")
     except Exception as e:
         log.error("Claude API error: %s", e)
         raise HTTPException(500, f"Claude API error: {e}")
