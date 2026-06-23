@@ -378,7 +378,7 @@ Text:
     try:
         client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-6-20250620",
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
@@ -465,7 +465,7 @@ Generate a complete, well-structured SOP based on this material. Follow the temp
     try:
         client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-6-20250620",
             max_tokens=8000,
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_prompt}],
